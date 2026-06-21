@@ -74,8 +74,51 @@
   .bilan-value.pos{color:var(--green);}
   .bilan-value.neg{color:var(--red);}
 
+  /* MONTH BUBBLE */
+  .month-bubble{
+    width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--surface); border:1px solid var(--border); border-radius:18px;
+    padding:13px 15px; margin-bottom:16px; text-align:left; color:inherit;
+    -webkit-appearance:none; appearance:none;
+  }
+  .month-bubble:active{background:var(--surface-2);}
+  .month-bubble-left{display:flex; flex-direction:column; gap:3px; min-width:0;}
+  .month-bubble-sub{font-size:13px; color:var(--text-dim); font-weight:600;}
+  .month-bubble-right{display:flex; align-items:center; gap:8px; flex-shrink:0;}
+  .month-bubble-value{font-size:17px; font-weight:700;}
+  .month-bubble-value.pos{color:var(--green);}
+  .month-bubble-value.neg{color:var(--red);}
+  .month-bubble-chevron{font-size:20px; color:var(--text-dim);}
+
+  /* MONTH VIEW (full screen, swipeable) */
+  .month-view{
+    position:fixed; inset:0; z-index:65; background:var(--bg);
+    transform:translateY(100%); transition:transform .32s cubic-bezier(.32,.72,0,1);
+    display:flex; flex-direction:column;
+  }
+  .month-view.show{transform:translateY(0);}
+  .month-view-header{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:calc(14px + var(--safe-top)) 14px 14px; border-bottom:1px solid var(--border); flex-shrink:0;
+  }
+  .month-back{
+    width:34px;height:34px;border-radius:10px;border:1px solid var(--border);
+    background:var(--surface); color:var(--text); font-size:20px; display:flex; align-items:center; justify-content:center;
+  }
+  .month-view-title{font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:700;}
+  .month-swipe-area{flex:1; overflow:hidden; position:relative; touch-action:pan-y;}
+  .month-view-content{height:100%; overflow-y:auto; padding:16px 16px calc(24px + var(--safe-bottom));}
+  .month-hint{text-align:center; font-size:11.5px; color:var(--text-dim); margin-bottom:14px;}
+  .month-stats-row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;}
+  .month-bilan-card{
+    background:var(--surface-2); border:1px solid var(--border); border-radius:18px; padding:18px;
+    margin-bottom:16px; display:flex; flex-direction:column; align-items:center; gap:5px;
+  }
+  .month-bilan-card .lab{font-size:11px; color:var(--text-dim); font-weight:600; text-transform:uppercase; letter-spacing:.6px;}
+  .month-bilan-card .val{font-size:26px; font-weight:700;}
+
   /* MAIN */
-  main{padding:calc(96px + var(--safe-top)) 16px 24px;}
+  main{padding:calc(var(--header-h, 132px) + 14px) 16px 24px;}
   .section-title{font-size:12px; text-transform:uppercase; letter-spacing:.8px; color:var(--text-dim); font-weight:600; margin:18px 2px 10px;}
   .section-title:first-child{margin-top:0;}
 
@@ -185,7 +228,7 @@
 </head>
 <body>
 
-<header>
+<header id="siteHeader">
   <div class="hdr-left">
     <div class="hdr-title-row">
       <span class="hdr-title">Mon Portfolio</span>
@@ -202,7 +245,18 @@
   </div>
 </header>
 
-<main>
+<main id="mainContent">
+  <button class="month-bubble" id="openMonth" type="button">
+    <div class="month-bubble-left">
+      <span class="bilan-label">Bilan du mois</span>
+      <span class="month-bubble-sub" id="monthBubbleLabel">--</span>
+    </div>
+    <div class="month-bubble-right">
+      <span class="month-bubble-value num" id="monthBubbleValue">0 €</span>
+      <span class="month-bubble-chevron">›</span>
+    </div>
+  </button>
+
   <div class="section-title">Aperçu</div>
   <div class="stats-row">
     <div class="stat-card">
@@ -275,6 +329,18 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- MONTH VIEW -->
+<div class="month-view" id="monthView">
+  <div class="month-view-header">
+    <button class="month-back" id="closeMonth" aria-label="Retour">‹</button>
+    <div class="month-view-title" id="monthViewTitle">--</div>
+    <div style="width:34px"></div>
+  </div>
+  <div class="month-swipe-area" id="monthSwipeArea">
+    <div class="month-view-content" id="monthViewContent"></div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -288,6 +354,7 @@
   var LS_TX = "mp_transactions";
   var LS_BTCQTY = "mp_btc_qty";
   var LS_PRICE_CACHE = "mp_price_cache";
+  var MONTH_NAMES = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
 
   // ---------- STATE ----------
   var state = {
@@ -390,6 +457,22 @@
     return state.transactions.filter(function(t){ return new Date(t.date+"T00:00:00").getFullYear() === y; });
   }
 
+  function computeMonthStats(year, monthIdx){
+    var totalIn = 0, totalOut = 0, evolution = 0;
+    var txs = state.transactions.filter(function(t){
+      var d = new Date(t.date+"T00:00:00");
+      return d.getFullYear() === year && d.getMonth() === monthIdx;
+    });
+    txs.forEach(function(t){
+      if(t.type === "Rentrée") totalIn += t.amount;
+      else if(t.type === "Dépense") totalOut += t.amount;
+      else if(t.type === "Investissement" && t.category === "Crypto" && t.btcQty && state.btcPrice !== null){
+        evolution += (t.btcQty * state.btcPrice) - t.amount;
+      }
+    });
+    return { totalIn: totalIn, totalOut: totalOut, evolution: evolution, bilan: totalIn - totalOut + evolution, txs: txs };
+  }
+
   function renderBilan(){
     var tx = yearTx();
     var totalIn = 0, totalOut = 0, evolution = 0;
@@ -410,6 +493,22 @@
 
     document.getElementById("statIn").textContent = fmtEur(totalIn);
     document.getElementById("statOut").textContent = fmtEur(totalOut);
+
+    renderMonthBubble();
+  }
+
+  function renderTxItemHtml(t){
+    var cls = t.type === "Rentrée" ? "green" : (t.type === "Dépense" ? "red" : "accent");
+    var sign = t.type === "Rentrée" ? "+" : (t.type === "Dépense" ? "−" : "");
+    var metaParts = [fmtDate(t.date), t.category];
+    if(t.type === "Investissement" && t.btcQty) metaParts.push(fmtBtc(t.btcQty));
+    return '<div class="tx-item" data-id="'+t.id+'">' +
+      '<div class="tx-icon">'+iconFor(t.type,t.category)+'</div>' +
+      '<div class="tx-mid"><div class="tx-desc">'+escapeHtml(t.description)+'</div>' +
+      '<div class="tx-meta">'+metaParts.map(escapeHtml).join(' · ')+'</div></div>' +
+      '<div class="tx-amount '+cls+'">'+sign+fmtEur(t.amount)+'</div>' +
+      '<button class="tx-del" data-del="'+t.id+'" aria-label="Supprimer">✕</button>' +
+      '</div>';
   }
 
   function renderList(){
@@ -421,19 +520,7 @@
       list.innerHTML = '<div class="empty-state">Aucune transaction pour le moment.<br>Ajoutez votre première entrée avec le bouton +.</div>';
       return;
     }
-    list.innerHTML = sorted.map(function(t){
-      var cls = t.type === "Rentrée" ? "green" : (t.type === "Dépense" ? "red" : "accent");
-      var sign = t.type === "Rentrée" ? "+" : (t.type === "Dépense" ? "−" : "");
-      var metaParts = [fmtDate(t.date), t.category];
-      if(t.type === "Investissement" && t.btcQty) metaParts.push(fmtBtc(t.btcQty));
-      return '<div class="tx-item" data-id="'+t.id+'">' +
-        '<div class="tx-icon">'+iconFor(t.type,t.category)+'</div>' +
-        '<div class="tx-mid"><div class="tx-desc">'+escapeHtml(t.description)+'</div>' +
-        '<div class="tx-meta">'+metaParts.map(escapeHtml).join(' · ')+'</div></div>' +
-        '<div class="tx-amount '+cls+'">'+sign+fmtEur(t.amount)+'</div>' +
-        '<button class="tx-del" data-del="'+t.id+'" aria-label="Supprimer">✕</button>' +
-        '</div>';
-    }).join("");
+    list.innerHTML = sorted.map(renderTxItemHtml).join("");
   }
 
   function escapeHtml(s){
@@ -565,6 +652,144 @@
     closeSheets();
     showToast("Paramètres enregistrés");
   });
+
+  // ---------- MONTH BUBBLE & MONTH VIEW ----------
+  function renderMonthBubble(){
+    var now = new Date();
+    var stats = computeMonthStats(now.getFullYear(), now.getMonth());
+    document.getElementById("monthBubbleLabel").textContent = MONTH_NAMES[now.getMonth()] + " " + now.getFullYear();
+    var el = document.getElementById("monthBubbleValue");
+    el.textContent = (stats.bilan >= 0 ? "+" : "") + eurFmt0.format(stats.bilan);
+    el.classList.toggle("pos", stats.bilan >= 0);
+    el.classList.toggle("neg", stats.bilan < 0);
+  }
+
+  var monthState = { date: new Date() };
+
+  function renderMonthView(){
+    var y = monthState.date.getFullYear();
+    var m = monthState.date.getMonth();
+    var stats = computeMonthStats(y, m);
+    document.getElementById("monthViewTitle").textContent = MONTH_NAMES[m] + " " + y;
+    var html = '<div class="month-hint">‹ Glissez pour changer de mois ›</div>';
+    html += '<div class="month-bilan-card"><span class="lab">Bilan du mois</span><span class="val num ' +
+      (stats.bilan >= 0 ? "pos" : "neg") + '" style="color:' + (stats.bilan >= 0 ? "var(--green)" : "var(--red)") + '">' +
+      (stats.bilan >= 0 ? "+" : "") + fmtEur(stats.bilan) + '</span></div>';
+    html += '<div class="month-stats-row"><div class="stat-card"><div class="lab">Rentrées</div><div class="val green num">' +
+      fmtEur(stats.totalIn) + '</div></div><div class="stat-card"><div class="lab">Dépenses</div><div class="val red num">' +
+      fmtEur(stats.totalOut) + '</div></div></div>';
+    if(stats.txs.length === 0){
+      html += '<div class="empty-state">Aucune transaction ce mois-ci.</div>';
+    } else {
+      var sorted = stats.txs.slice().sort(function(a,b){
+        return b.date.localeCompare(a.date) || (b.createdAt||0) - (a.createdAt||0);
+      });
+      html += '<div class="tx-list">' + sorted.map(renderTxItemHtml).join("") + '</div>';
+    }
+    document.getElementById("monthViewContent").innerHTML = html;
+  }
+
+  function shiftMonth(delta){
+    monthState.date = new Date(monthState.date.getFullYear(), monthState.date.getMonth() + delta, 1);
+    renderMonthView();
+  }
+
+  function openMonthView(){
+    monthState.date = new Date();
+    renderMonthView();
+    document.getElementById("monthView").classList.add("show");
+  }
+  function closeMonthView(){
+    document.getElementById("monthView").classList.remove("show");
+  }
+
+  document.getElementById("openMonth").addEventListener("click", openMonthView);
+  document.getElementById("closeMonth").addEventListener("click", closeMonthView);
+
+  document.getElementById("monthViewContent").addEventListener("click", function(e){
+    var delBtn = e.target.closest("[data-del]");
+    if(!delBtn) return;
+    var id = delBtn.getAttribute("data-del");
+    if(confirm("Supprimer cette transaction ?")){
+      state.transactions = state.transactions.filter(function(t){ return t.id !== id; });
+      saveTx();
+      renderList();
+      renderBilan();
+      renderMonthView();
+      showToast("Entrée supprimée");
+    }
+  });
+
+  // swipe between months
+  (function(){
+    var area = document.getElementById("monthSwipeArea");
+    var content = document.getElementById("monthViewContent");
+    var startX = 0, startY = 0, dx = 0, dragging = false;
+
+    area.addEventListener("touchstart", function(e){
+      if(e.touches.length !== 1) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      dx = 0; dragging = true;
+      content.style.transition = "none";
+    }, {passive:true});
+
+    area.addEventListener("touchmove", function(e){
+      if(!dragging) return;
+      var curX = e.touches[0].clientX;
+      var curY = e.touches[0].clientY;
+      var deltaX = curX - startX;
+      var deltaY = curY - startY;
+      if(Math.abs(deltaY) > Math.abs(deltaX)) return;
+      dx = deltaX;
+      content.style.transform = "translateX(" + dx + "px)";
+    }, {passive:true});
+
+    area.addEventListener("touchend", function(){
+      if(!dragging) return;
+      dragging = false;
+      content.style.transition = "transform .25s ease";
+      var threshold = 70;
+      if(dx < -threshold){
+        content.style.transform = "translateX(-100%)";
+        setTimeout(function(){
+          shiftMonth(1);
+          content.style.transition = "none";
+          content.style.transform = "translateX(100%)";
+          requestAnimationFrame(function(){
+            content.style.transition = "transform .25s ease";
+            content.style.transform = "translateX(0)";
+          });
+        }, 180);
+      } else if(dx > threshold){
+        content.style.transform = "translateX(100%)";
+        setTimeout(function(){
+          shiftMonth(-1);
+          content.style.transition = "none";
+          content.style.transform = "translateX(-100%)";
+          requestAnimationFrame(function(){
+            content.style.transition = "transform .25s ease";
+            content.style.transform = "translateX(0)";
+          });
+        }, 180);
+      } else {
+        content.style.transform = "translateX(0)";
+      }
+    });
+  })();
+
+  // ---------- HEADER HEIGHT SYNC (fixes overlap with main content) ----------
+  function syncHeaderHeight(){
+    var header = document.getElementById("siteHeader");
+    if(!header) return;
+    document.documentElement.style.setProperty("--header-h", header.offsetHeight + "px");
+  }
+  syncHeaderHeight();
+  window.addEventListener("load", syncHeaderHeight);
+  window.addEventListener("resize", syncHeaderHeight);
+  if(window.ResizeObserver){
+    new ResizeObserver(syncHeaderHeight).observe(document.getElementById("siteHeader"));
+  }
 
   // ---------- INIT ----------
   loadState();
