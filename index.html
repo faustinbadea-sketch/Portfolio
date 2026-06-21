@@ -324,6 +324,14 @@
     <input type="number" inputmode="decimal" step="0.00000001" min="0" class="num" id="s_btcqty" placeholder="0.00000000">
   </div>
   <button type="button" class="btn-primary" id="saveSettings">Enregistrer</button>
+
+  <div class="field" style="margin-top:18px; border-top:1px solid var(--border); padding-top:16px;">
+    <label>Sauvegarde de tes données</label>
+    <button type="button" class="btn-ghost" id="exportData" style="margin-top:8px;">⬇ Exporter mes données (.json)</button>
+    <button type="button" class="btn-ghost" id="importDataBtn">⬆ Importer une sauvegarde</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none;">
+  </div>
+
   <button type="button" class="btn-ghost" id="cancelSettings">Fermer</button>
 </div>
 
@@ -790,6 +798,62 @@
   if(window.ResizeObserver){
     new ResizeObserver(syncHeaderHeight).observe(document.getElementById("siteHeader"));
   }
+
+  // ---------- BACKUP / RESTORE ----------
+  function exportData(){
+    var payload = {
+      exportedAt: new Date().toISOString(),
+      btcQty: state.btcQty,
+      transactions: state.transactions
+    };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    var fname = "portfolio-backup-" + todayStr() + ".json";
+    a.href = url;
+    a.download = fname;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+    showToast("Sauvegarde téléchargée");
+  }
+
+  document.getElementById("exportData").addEventListener("click", exportData);
+
+  document.getElementById("importDataBtn").addEventListener("click", function(){
+    document.getElementById("importFile").click();
+  });
+
+  document.getElementById("importFile").addEventListener("change", function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        var data = JSON.parse(ev.target.result);
+        if(!data || !Array.isArray(data.transactions)){
+          showToast("Fichier invalide");
+          return;
+        }
+        if(!confirm("Remplacer toutes les données actuelles par cette sauvegarde ?")){
+          e.target.value = "";
+          return;
+        }
+        state.transactions = data.transactions;
+        state.btcQty = typeof data.btcQty === "number" ? data.btcQty : 0;
+        saveTx();
+        saveBtcQty();
+        renderAll();
+        closeSheets();
+        showToast("Données restaurées");
+      }catch(err){
+        showToast("Fichier invalide");
+      }
+      e.target.value = "";
+    };
+    reader.readAsText(file);
+  });
 
   // ---------- INIT ----------
   loadState();
