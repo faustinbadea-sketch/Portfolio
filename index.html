@@ -68,7 +68,9 @@
     flex-shrink:0; min-width:90px; border-radius:16px; padding:9px 12px;
     background:var(--surface-2); border:1px solid var(--border);
     display:flex; flex-direction:column; align-items:flex-end; gap:2px;
+    color:inherit; font-family:inherit; -webkit-appearance:none; appearance:none;
   }
+  .bilan-bubble:active{background:#222B38;}
   .bilan-label{font-size:9px; text-transform:uppercase; letter-spacing:.6px; color:var(--text-dim); font-weight:600;}
   .bilan-value{font-size:16px; font-weight:700;}
   .bilan-value.pos{color:var(--green);}
@@ -140,7 +142,9 @@
   .tx-item{
     display:flex; align-items:center; gap:12px;
     background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:12px 12px;
+    text-align:left; width:100%; color:inherit; font-family:inherit; -webkit-appearance:none; appearance:none;
   }
+  .tx-item:active{background:var(--surface-2);}
   .tx-icon{
     width:42px;height:42px;border-radius:13px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
     font-size:19px; background:var(--surface-2);
@@ -152,11 +156,8 @@
   .tx-amount.green{color:var(--green);}
   .tx-amount.red{color:var(--red);}
   .tx-amount.accent{color:var(--accent);}
-  .tx-del{
-    width:30px;height:30px;border-radius:9px;border:none;background:transparent;color:var(--text-dim);
-    font-size:17px; flex-shrink:0;
-  }
-  .tx-del:active{background:var(--surface-2); color:var(--red);}
+  .tx-amount.neutral{color:var(--text-dim);}
+  .tx-chevron{font-size:18px; color:var(--text-dim); flex-shrink:0;}
 
   /* FAB */
   .fab{
@@ -172,11 +173,11 @@
   /* SHEET / MODAL */
   .overlay{
     position:fixed; inset:0; background:rgba(5,7,10,.6); backdrop-filter:blur(2px);
-    z-index:60; opacity:0; pointer-events:none; transition:opacity .25s ease;
+    z-index:70; opacity:0; pointer-events:none; transition:opacity .25s ease;
   }
   .overlay.show{opacity:1; pointer-events:auto;}
   .sheet{
-    position:fixed; left:0; right:0; bottom:0; z-index:61;
+    position:fixed; left:0; right:0; bottom:0; z-index:71;
     background:var(--surface); border-top:1px solid var(--border);
     border-radius:24px 24px 0 0; padding:14px 18px calc(22px + var(--safe-bottom));
     transform:translateY(100%); transition:transform .3s cubic-bezier(.32,.72,0,1);
@@ -195,12 +196,47 @@
   }
   .field input.num, .field select.num{font-family:'JetBrains Mono',monospace;}
   .field input:focus, .field select:focus, .field textarea:focus{outline:2px solid var(--accent); outline-offset:1px;}
-  .seg{display:flex; gap:8px;}
+  .seg{display:flex; gap:8px; flex-wrap:wrap;}
   .seg button{
-    flex:1; padding:13px 4px; border-radius:14px; border:1px solid var(--border);
+    flex:1 1 40%; padding:13px 4px; border-radius:14px; border:1px solid var(--border);
     background:var(--surface-2); color:var(--text-dim); font-size:13.5px; font-weight:600;
   }
   .seg button.active{background:rgba(242,169,59,.12); border-color:var(--accent); color:var(--accent);}
+
+  .field-pair{display:flex; gap:10px;}
+  .field-pair .field{flex:1;}
+
+  /* ACCOUNTS */
+  .accounts-row{display:flex; gap:10px; overflow-x:auto; padding-bottom:2px; margin-bottom:4px; -webkit-overflow-scrolling:touch;}
+  .account-card{
+    flex:0 0 auto; min-width:128px; background:var(--surface); border:1px solid var(--border); border-radius:18px;
+    padding:13px 14px; text-align:left; color:inherit; font-family:inherit;
+    -webkit-appearance:none; appearance:none;
+  }
+  button.account-card:active{background:var(--surface-2);}
+  .account-card-top{display:flex; align-items:center; gap:7px; margin-bottom:8px;}
+  .account-card-icon{font-size:16px;}
+  .account-card-name{font-size:11.5px; color:var(--text-dim); font-weight:600; white-space:nowrap;}
+  .account-card-balance{font-size:15.5px; font-weight:700;}
+  .account-card-btn{border-color:rgba(242,169,59,.35);}
+
+  /* PIE CHARTS */
+  .pie-section-title{font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--text-dim); font-weight:600; margin:6px 0 10px;}
+  .pie-block{
+    display:flex; align-items:center; gap:16px; background:var(--surface); border:1px solid var(--border);
+    border-radius:18px; padding:14px; margin-bottom:14px;
+  }
+  .pie-block svg{flex-shrink:0;}
+  .pie-legend{flex:1; min-width:0; display:flex; flex-direction:column; gap:6px;}
+  .pie-legend-item{display:flex; align-items:center; gap:7px; font-size:12px;}
+  .pie-legend-swatch{width:9px;height:9px;border-radius:3px; flex-shrink:0;}
+  .pie-legend-label{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text-dim);}
+  .pie-legend-val{font-size:11.5px; font-weight:600; flex-shrink:0;}
+
+  /* BITCOIN CHART SHEET */
+  .btc-sheet-price{font-size:28px; font-weight:700; text-align:center; margin:2px 0 16px;}
+  .btc-chart-wrap{min-height:150px; display:flex; align-items:center; justify-content:center; margin-top:14px;}
+  .chart-msg{font-size:13px; color:var(--text-dim);}
 
   .btn-primary{
     width:100%; padding:16px; border:none; border-radius:16px; margin-top:6px;
@@ -239,10 +275,10 @@
     </div>
     <div class="btc-sub"><span class="live-dot" id="liveDot"></span><span id="btcHolding">Mes BTC : <b class="num">--</b></span></div>
   </div>
-  <div class="bilan-bubble">
+  <button type="button" class="bilan-bubble" id="openYear">
     <span class="bilan-label">Bilan annuel</span>
     <span class="bilan-value num" id="bilanValue">0 €</span>
-  </div>
+  </button>
 </header>
 
 <main id="mainContent">
@@ -256,6 +292,26 @@
       <span class="month-bubble-chevron">›</span>
     </div>
   </button>
+
+  <div class="section-title">Mes comptes</div>
+  <div class="accounts-row">
+    <div class="account-card" id="accCourant">
+      <div class="account-card-top"><span class="account-card-icon">🏦</span><span class="account-card-name">Compte courant</span></div>
+      <div class="account-card-balance num" id="accCourantVal">0,00 €</div>
+    </div>
+    <div class="account-card" id="accLivretJeune">
+      <div class="account-card-top"><span class="account-card-icon">🐷</span><span class="account-card-name">Livret Jeune</span></div>
+      <div class="account-card-balance num" id="accLivretJeuneVal">0,00 €</div>
+    </div>
+    <div class="account-card" id="accLivretA">
+      <div class="account-card-top"><span class="account-card-icon">🛡️</span><span class="account-card-name">Livret A</span></div>
+      <div class="account-card-balance num" id="accLivretAVal">0,00 €</div>
+    </div>
+    <button type="button" class="account-card account-card-btn" id="accBitcoin">
+      <div class="account-card-top"><span class="account-card-icon">₿</span><span class="account-card-name">Bitcoin</span></div>
+      <div class="account-card-balance num" id="accBitcoinVal">0,00 €</div>
+    </button>
+  </div>
 
   <div class="section-title">Aperçu</div>
   <div class="stats-row">
@@ -280,7 +336,7 @@
 <!-- FORM SHEET -->
 <div class="sheet" id="formSheet">
   <div class="sheet-handle"></div>
-  <div class="sheet-title">Nouvelle entrée</div>
+  <div class="sheet-title" id="formSheetTitle">Nouvelle entrée</div>
   <form id="txForm">
     <div class="field">
       <label>Date</label>
@@ -292,15 +348,26 @@
         <button type="button" data-val="Dépense" class="active">Dépense</button>
         <button type="button" data-val="Rentrée">Rentrée</button>
         <button type="button" data-val="Investissement">Investissement</button>
+        <button type="button" data-val="Virement">Virement</button>
       </div>
     </div>
-    <div class="field">
+    <div class="field" id="f_category_wrap">
       <label>Catégorie</label>
       <select id="f_category"></select>
     </div>
+    <div class="field-pair" id="f_account_wrap" style="display:none;">
+      <div class="field">
+        <label>De (compte source)</label>
+        <select id="f_from_account"></select>
+      </div>
+      <div class="field">
+        <label>Vers (compte destination)</label>
+        <select id="f_to_account"></select>
+      </div>
+    </div>
     <div class="field">
       <label>Description</label>
-      <input type="text" id="f_desc" placeholder="Ex : Courses de la semaine" maxlength="60" required>
+      <input type="text" id="f_desc" placeholder="Ex : Courses de la semaine" maxlength="60">
     </div>
     <div class="field">
       <label id="f_amount_label">Montant (€)</label>
@@ -310,15 +377,58 @@
       <label>Quantité BTC achetée</label>
       <input type="number" inputmode="decimal" step="0.00000001" min="0" class="num" id="f_btcqty" placeholder="0.00000000">
     </div>
-    <button type="submit" class="btn-primary">Enregistrer</button>
+    <button type="submit" class="btn-primary" id="submitFormBtn">Enregistrer</button>
     <button type="button" class="btn-ghost" id="cancelForm">Annuler</button>
+    <button type="button" class="btn-ghost" id="deleteTxBtn" style="display:none; color:var(--red); border-color:rgba(251,107,107,.3);">Supprimer cette transaction</button>
   </form>
+</div>
+
+<!-- ADD CATEGORY SHEET -->
+<div class="sheet" id="addCatSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Nouvelle catégorie</div>
+  <div class="field">
+    <label>Nom</label>
+    <input type="text" id="newCatName" maxlength="24" placeholder="Ex : Cadeaux">
+  </div>
+  <div class="field">
+    <label>Emoji</label>
+    <input type="text" id="newCatEmoji" maxlength="4" placeholder="🎁">
+  </div>
+  <button type="button" class="btn-primary" id="confirmAddCat">Ajouter</button>
+  <button type="button" class="btn-ghost" id="cancelAddCat">Annuler</button>
+</div>
+
+<!-- BITCOIN CHART SHEET -->
+<div class="sheet" id="btcSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Bitcoin</div>
+  <div class="btc-sheet-price num" id="btcSheetPrice">-- €</div>
+  <div class="seg" id="btcRange">
+    <button type="button" data-range="1" class="active">1 j</button>
+    <button type="button" data-range="30">1 mois</button>
+    <button type="button" data-range="365">1 an</button>
+  </div>
+  <div class="btc-chart-wrap" id="btcChartWrap"><span class="chart-msg">Chargement…</span></div>
+  <button type="button" class="btn-ghost" id="closeBtcSheet">Fermer</button>
 </div>
 
 <!-- SETTINGS SHEET -->
 <div class="sheet" id="settingsSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-title">Paramètres</div>
+  <div class="field">
+    <label>Compte courant (€)</label>
+    <input type="number" inputmode="decimal" step="0.01" class="num" id="s_acc_courant" placeholder="0.00">
+  </div>
+  <div class="field">
+    <label>Livret Jeune (€)</label>
+    <input type="number" inputmode="decimal" step="0.01" class="num" id="s_acc_jeune" placeholder="0.00">
+  </div>
+  <div class="field">
+    <label>Livret A (€)</label>
+    <input type="number" inputmode="decimal" step="0.01" class="num" id="s_acc_a" placeholder="0.00">
+  </div>
   <div class="field">
     <label>Quantité de BTC possédée</label>
     <input type="number" inputmode="decimal" step="0.00000001" min="0" class="num" id="s_btcqty" placeholder="0.00000000">
@@ -362,14 +472,20 @@
   var LS_TX = "mp_transactions";
   var LS_BTCQTY = "mp_btc_qty";
   var LS_PRICE_CACHE = "mp_price_cache";
+  var LS_ACCOUNTS = "mp_accounts";
+  var LS_CUSTOM_CATS = "mp_custom_cats";
   var MONTH_NAMES = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+  var ACCOUNTS = ["Compte courant","Livret Jeune","Livret A"];
+  var ACCOUNT_FIELD_MAP = { "Compte courant":"accCourantVal", "Livret Jeune":"accLivretJeuneVal", "Livret A":"accLivretAVal" };
 
   // ---------- STATE ----------
   var state = {
     transactions: [],
     btcQty: 0,
     btcPrice: null,
-    priceIsLive: false
+    priceIsLive: false,
+    accounts: { "Compte courant": 0, "Livret Jeune": 0, "Livret A": 0 },
+    customCategories: { "Dépense": [], "Rentrée": [] }
   };
 
   // ---------- STORAGE ----------
@@ -384,10 +500,25 @@
       var cache = JSON.parse(localStorage.getItem(LS_PRICE_CACHE) || "null");
       if(cache && cache.price) state.btcPrice = cache.price;
     }catch(e){}
+    try{
+      var acc = JSON.parse(localStorage.getItem(LS_ACCOUNTS) || "null");
+      if(acc && typeof acc === "object"){
+        ACCOUNTS.forEach(function(a){ state.accounts[a] = typeof acc[a] === "number" ? acc[a] : 0; });
+      }
+    }catch(e){}
+    try{
+      var cc = JSON.parse(localStorage.getItem(LS_CUSTOM_CATS) || "null");
+      if(cc && typeof cc === "object"){
+        state.customCategories["Dépense"] = Array.isArray(cc["Dépense"]) ? cc["Dépense"] : [];
+        state.customCategories["Rentrée"] = Array.isArray(cc["Rentrée"]) ? cc["Rentrée"] : [];
+      }
+    }catch(e){}
   }
   function saveTx(){ localStorage.setItem(LS_TX, JSON.stringify(state.transactions)); }
   function saveBtcQty(){ localStorage.setItem(LS_BTCQTY, String(state.btcQty)); }
   function cachePrice(p){ localStorage.setItem(LS_PRICE_CACHE, JSON.stringify({price:p, ts:Date.now()})); }
+  function saveAccounts(){ localStorage.setItem(LS_ACCOUNTS, JSON.stringify(state.accounts)); }
+  function saveCustomCategories(){ localStorage.setItem(LS_CUSTOM_CATS, JSON.stringify(state.customCategories)); }
 
   // ---------- FORMAT HELPERS ----------
   var eurFmt = new Intl.NumberFormat('fr-FR', {style:'currency', currency:'EUR', maximumFractionDigits:2});
@@ -411,7 +542,8 @@
   }
   function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
   function iconFor(type, cat){
-    var list = CATEGORIES[type] || [];
+    if(type === "Virement") return "🔁";
+    var list = (CATEGORIES[type] || []).concat(state.customCategories[type] || []);
     for(var i=0;i<list.length;i++){ if(list[i][0]===cat) return list[i][1]; }
     return "🔘";
   }
@@ -429,6 +561,7 @@
           cachePrice(p);
           renderHeader(prev);
           renderBilan();
+          renderAccounts();
         }
       })
       .catch(function(){
@@ -460,17 +593,77 @@
       (totalVal !== null ? " · <b class='num'>" + fmtEur(totalVal) + "</b>" : "");
   }
 
-  function yearTx(){
-    var y = new Date().getFullYear();
-    return state.transactions.filter(function(t){ return new Date(t.date+"T00:00:00").getFullYear() === y; });
+  // ---------- ACCOUNTS ----------
+  function applyTxToAccounts(t, sign){
+    if(t.type === "Virement"){
+      if(t.fromAccount in state.accounts) state.accounts[t.fromAccount] -= sign * t.amount;
+      if(t.toAccount in state.accounts) state.accounts[t.toAccount] += sign * t.amount;
+    } else if(t.type === "Rentrée"){
+      state.accounts["Compte courant"] += sign * t.amount;
+    } else {
+      // Dépense or Investissement: money leaves the compte courant
+      state.accounts["Compte courant"] -= sign * t.amount;
+    }
   }
 
-  function computeMonthStats(year, monthIdx){
-    var totalIn = 0, totalOut = 0, evolution = 0;
-    var txs = state.transactions.filter(function(t){
-      var d = new Date(t.date+"T00:00:00");
-      return d.getFullYear() === year && d.getMonth() === monthIdx;
+  function renderAccounts(){
+    ACCOUNTS.forEach(function(a){
+      var el = document.getElementById(ACCOUNT_FIELD_MAP[a]);
+      if(el) el.textContent = fmtEur(state.accounts[a] || 0);
     });
+    var btcVal = (state.btcPrice !== null) ? state.btcQty * state.btcPrice : 0;
+    var btcEl = document.getElementById("accBitcoinVal");
+    if(btcEl) btcEl.textContent = fmtEur(btcVal);
+  }
+
+  // ---------- CATEGORY BREAKDOWN / PIE CHARTS ----------
+  function categoryBreakdown(txs, type){
+    var map = {};
+    txs.forEach(function(t){
+      if(t.type !== type) return;
+      map[t.category] = (map[t.category] || 0) + t.amount;
+    });
+    return Object.keys(map).map(function(k){ return { label: k, value: map[k] }; }).sort(function(a,b){ return b.value - a.value; });
+  }
+
+  var PIE_COLORS = ["#F2A93B","#34D399","#5AB8FF","#FB6B6B","#C77DFF","#FFD166","#4DD0E1","#FF8FAB"];
+
+  function buildPieSVG(segments){
+    var total = segments.reduce(function(s,x){ return s + x.value; }, 0);
+    if(total <= 0) return "";
+    var size = 92, r = 40, cx = size/2, cy = size/2;
+    var angle = -Math.PI/2;
+    var paths = "";
+    segments.forEach(function(seg, i){
+      var frac = seg.value / total;
+      var sweep = frac * Math.PI * 2;
+      var x1 = cx + r*Math.cos(angle), y1 = cy + r*Math.sin(angle);
+      var endAngle = angle + sweep;
+      var x2 = cx + r*Math.cos(endAngle), y2 = cy + r*Math.sin(endAngle);
+      var large = sweep > Math.PI ? 1 : 0;
+      if(segments.length === 1){
+        paths += '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+PIE_COLORS[i % PIE_COLORS.length]+'"/>';
+      } else {
+        paths += '<path d="M'+cx+','+cy+' L'+x1.toFixed(2)+','+y1.toFixed(2)+' A'+r+','+r+' 0 '+large+' 1 '+x2.toFixed(2)+','+y2.toFixed(2)+' Z" fill="'+PIE_COLORS[i % PIE_COLORS.length]+'"/>';
+      }
+      angle = endAngle;
+    });
+    paths += '<circle cx="'+cx+'" cy="'+cy+'" r="'+(r*0.55)+'" fill="var(--surface)"/>';
+    return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'">'+paths+'</svg>';
+  }
+
+  function renderPieBlock(title, segments){
+    if(segments.length === 0) return "";
+    var svg = buildPieSVG(segments);
+    var legend = segments.slice(0,6).map(function(s,i){
+      return '<div class="pie-legend-item"><span class="pie-legend-swatch" style="background:'+PIE_COLORS[i % PIE_COLORS.length]+'"></span>' +
+        '<span class="pie-legend-label">'+escapeHtml(s.label)+'</span><span class="pie-legend-val num">'+fmtEur(s.value)+'</span></div>';
+    }).join("");
+    return '<div class="pie-section-title">'+title+'</div><div class="pie-block">'+svg+'<div class="pie-legend">'+legend+'</div></div>';
+  }
+
+  function computeStatsForTxs(txs){
+    var totalIn = 0, totalOut = 0, evolution = 0;
     txs.forEach(function(t){
       if(t.type === "Rentrée") totalIn += t.amount;
       else if(t.type === "Dépense") totalOut += t.amount;
@@ -481,42 +674,56 @@
     return { totalIn: totalIn, totalOut: totalOut, evolution: evolution, bilan: totalIn - totalOut + evolution, txs: txs };
   }
 
-  function renderBilan(){
-    var tx = yearTx();
-    var totalIn = 0, totalOut = 0, evolution = 0;
-    tx.forEach(function(t){
-      if(t.type === "Rentrée") totalIn += t.amount;
-      else if(t.type === "Dépense") totalOut += t.amount;
-      else if(t.type === "Investissement"){
-        if(t.category === "Crypto" && t.btcQty && state.btcPrice !== null){
-          evolution += (t.btcQty * state.btcPrice) - t.amount;
-        }
-      }
+  function computeMonthStats(year, monthIdx){
+    var txs = state.transactions.filter(function(t){
+      var d = new Date(t.date+"T00:00:00");
+      return d.getFullYear() === year && d.getMonth() === monthIdx;
     });
-    var bilan = totalIn - totalOut + evolution;
-    var bilanEl = document.getElementById("bilanValue");
-    bilanEl.textContent = (bilan >= 0 ? "+" : "") + eurFmt0.format(bilan);
-    bilanEl.classList.toggle("pos", bilan >= 0);
-    bilanEl.classList.toggle("neg", bilan < 0);
+    return computeStatsForTxs(txs);
+  }
 
-    document.getElementById("statIn").textContent = fmtEur(totalIn);
-    document.getElementById("statOut").textContent = fmtEur(totalOut);
+  function computeYearStats(year){
+    var txs = state.transactions.filter(function(t){ return new Date(t.date+"T00:00:00").getFullYear() === year; });
+    return computeStatsForTxs(txs);
+  }
+
+  function renderBilan(){
+    var year = new Date().getFullYear();
+    var stats = computeYearStats(year);
+    var bilanEl = document.getElementById("bilanValue");
+    bilanEl.textContent = (stats.bilan >= 0 ? "+" : "") + eurFmt0.format(stats.bilan);
+    bilanEl.classList.toggle("pos", stats.bilan >= 0);
+    bilanEl.classList.toggle("neg", stats.bilan < 0);
+
+    document.getElementById("statIn").textContent = fmtEur(stats.totalIn);
+    document.getElementById("statOut").textContent = fmtEur(stats.totalOut);
 
     renderMonthBubble();
   }
 
   function renderTxItemHtml(t){
-    var cls = t.type === "Rentrée" ? "green" : (t.type === "Dépense" ? "red" : "accent");
-    var sign = t.type === "Rentrée" ? "+" : (t.type === "Dépense" ? "−" : "");
-    var metaParts = [fmtDate(t.date), t.category];
-    if(t.type === "Investissement" && t.btcQty) metaParts.push(fmtBtc(t.btcQty));
-    return '<div class="tx-item" data-id="'+t.id+'">' +
+    var cls, sign;
+    if(t.type === "Rentrée"){ cls = "green"; sign = "+"; }
+    else if(t.type === "Dépense"){ cls = "red"; sign = "−"; }
+    else if(t.type === "Virement"){ cls = "neutral"; sign = ""; }
+    else { cls = "accent"; sign = ""; }
+
+    var metaParts;
+    if(t.type === "Virement"){
+      metaParts = [fmtDate(t.date), t.fromAccount + " → " + t.toAccount];
+    } else {
+      metaParts = [fmtDate(t.date), t.category];
+      if(t.type === "Investissement" && t.btcQty) metaParts.push(fmtBtc(t.btcQty));
+    }
+    var desc = t.description && t.description.trim() ? t.description : (t.type === "Virement" ? "Virement" : t.category);
+
+    return '<button type="button" class="tx-item" data-id="'+t.id+'">' +
       '<div class="tx-icon">'+iconFor(t.type,t.category)+'</div>' +
-      '<div class="tx-mid"><div class="tx-desc">'+escapeHtml(t.description)+'</div>' +
+      '<div class="tx-mid"><div class="tx-desc">'+escapeHtml(desc)+'</div>' +
       '<div class="tx-meta">'+metaParts.map(escapeHtml).join(' · ')+'</div></div>' +
       '<div class="tx-amount '+cls+'">'+sign+fmtEur(t.amount)+'</div>' +
-      '<button class="tx-del" data-del="'+t.id+'" aria-label="Supprimer">✕</button>' +
-      '</div>';
+      '<span class="tx-chevron">›</span>' +
+      '</button>';
   }
 
   function renderList(){
@@ -541,6 +748,7 @@
     renderHeader(null);
     renderBilan();
     renderList();
+    renderAccounts();
   }
 
   // ---------- TOAST ----------
@@ -557,23 +765,53 @@
   var overlay = document.getElementById("overlay");
   var formSheet = document.getElementById("formSheet");
   var settingsSheet = document.getElementById("settingsSheet");
+  var addCatSheet = document.getElementById("addCatSheet");
+  var btcSheet = document.getElementById("btcSheet");
   var currentType = "Dépense";
+  var editingId = null;
 
   function populateCategories(){
     var sel = document.getElementById("f_category");
-    var opts = CATEGORIES[currentType];
-    sel.innerHTML = opts.map(function(o){ return '<option value="'+o[0]+'">'+o[1]+' '+o[0]+'</option>'; }).join("");
-    toggleBtcField();
+    if(currentType === "Virement"){
+      sel.innerHTML = "";
+      updateFormFieldsForType();
+      return;
+    }
+    var opts = (CATEGORIES[currentType] || []).concat(state.customCategories[currentType] || []);
+    var html = opts.map(function(o){ return '<option value="'+o[0]+'">'+o[1]+' '+o[0]+'</option>'; }).join("");
+    if(currentType === "Dépense" || currentType === "Rentrée"){
+      html += '<option value="__add__">➕ Ajouter une catégorie</option>';
+    }
+    sel.innerHTML = html;
+    updateFormFieldsForType();
   }
 
-  function toggleBtcField(){
-    var sel = document.getElementById("f_category");
-    var wrap = document.getElementById("f_btcqty_wrap");
+  function updateFormFieldsForType(){
+    var catWrap = document.getElementById("f_category_wrap");
+    var accWrap = document.getElementById("f_account_wrap");
+    var btcWrap = document.getElementById("f_btcqty_wrap");
     var label = document.getElementById("f_amount_label");
-    var show = currentType === "Investissement" && sel.value === "Crypto";
-    wrap.style.display = show ? "block" : "none";
-    label.textContent = show ? "Montant investi (€)" : "Montant (€)";
+    var catSel = document.getElementById("f_category");
+
+    var isVirement = currentType === "Virement";
+    catWrap.style.display = isVirement ? "none" : "block";
+    accWrap.style.display = isVirement ? "flex" : "none";
+
+    var showBtc = !isVirement && currentType === "Investissement" && catSel.value === "Crypto";
+    btcWrap.style.display = showBtc ? "block" : "none";
+
+    if(isVirement) label.textContent = "Montant du virement (€)";
+    else if(showBtc) label.textContent = "Montant investi (€)";
+    else label.textContent = "Montant (€)";
   }
+
+  function populateAccountSelects(){
+    var optsHtml = ACCOUNTS.map(function(a){ return '<option value="'+a+'">'+a+'</option>'; }).join("");
+    document.getElementById("f_from_account").innerHTML = optsHtml;
+    document.getElementById("f_to_account").innerHTML = optsHtml;
+    document.getElementById("f_to_account").selectedIndex = 1 % ACCOUNTS.length;
+  }
+  populateAccountSelects();
 
   document.querySelectorAll("#f_type button").forEach(function(btn){
     btn.addEventListener("click", function(){
@@ -583,7 +821,17 @@
       populateCategories();
     });
   });
-  document.getElementById("f_category").addEventListener("change", toggleBtcField);
+
+  document.getElementById("f_category").addEventListener("change", function(){
+    if(this.value === "__add__"){
+      document.getElementById("newCatName").value = "";
+      document.getElementById("newCatEmoji").value = "";
+      openSheet(addCatSheet);
+      if(this.options.length > 1) this.selectedIndex = 0;
+      return;
+    }
+    updateFormFieldsForType();
+  });
 
   function openSheet(sheetEl){
     overlay.classList.add("show");
@@ -593,10 +841,16 @@
     overlay.classList.remove("show");
     formSheet.classList.remove("show");
     settingsSheet.classList.remove("show");
+    addCatSheet.classList.remove("show");
+    btcSheet.classList.remove("show");
   }
   overlay.addEventListener("click", closeSheets);
 
-  document.getElementById("openForm").addEventListener("click", function(){
+  function resetFormForCreate(){
+    editingId = null;
+    document.getElementById("formSheetTitle").textContent = "Nouvelle entrée";
+    document.getElementById("submitFormBtn").textContent = "Enregistrer";
+    document.getElementById("deleteTxBtn").style.display = "none";
     document.getElementById("f_date").value = todayStr();
     document.getElementById("f_desc").value = "";
     document.getElementById("f_amount").value = "";
@@ -605,6 +859,42 @@
     document.querySelector('#f_type button[data-val="Dépense"]').classList.add("active");
     currentType = "Dépense";
     populateCategories();
+    populateAccountSelects();
+  }
+
+  function openEditForm(id){
+    var t = state.transactions.find(function(x){ return x.id === id; });
+    if(!t) return;
+    editingId = id;
+    document.getElementById("formSheetTitle").textContent = "Modifier l'entrée";
+    document.getElementById("submitFormBtn").textContent = "Modifier";
+    document.getElementById("deleteTxBtn").style.display = "block";
+
+    document.querySelectorAll("#f_type button").forEach(function(b){ b.classList.remove("active"); });
+    var typeBtn = document.querySelector('#f_type button[data-val="'+t.type+'"]');
+    if(typeBtn) typeBtn.classList.add("active");
+    currentType = t.type;
+    populateCategories();
+
+    document.getElementById("f_date").value = t.date;
+    document.getElementById("f_desc").value = t.description || "";
+    document.getElementById("f_amount").value = t.amount;
+
+    if(t.type === "Virement"){
+      populateAccountSelects();
+      document.getElementById("f_from_account").value = t.fromAccount;
+      document.getElementById("f_to_account").value = t.toAccount;
+      document.getElementById("f_btcqty").value = "";
+    } else {
+      document.getElementById("f_category").value = t.category;
+      document.getElementById("f_btcqty").value = (t.type === "Investissement" && t.category === "Crypto" && t.btcQty) ? t.btcQty : "";
+    }
+    updateFormFieldsForType();
+    openSheet(formSheet);
+  }
+
+  document.getElementById("openForm").addEventListener("click", function(){
+    resetFormForCreate();
     openSheet(formSheet);
   });
   document.getElementById("cancelForm").addEventListener("click", closeSheets);
@@ -612,42 +902,114 @@
   document.getElementById("txForm").addEventListener("submit", function(e){
     e.preventDefault();
     var date = document.getElementById("f_date").value || todayStr();
-    var category = document.getElementById("f_category").value;
-    var description = document.getElementById("f_desc").value.trim();
     var amount = parseFloat(document.getElementById("f_amount").value);
-    if(!description || isNaN(amount) || amount < 0){
-      showToast("Veuillez vérifier les champs.");
+    if(isNaN(amount) || amount <= 0){
+      showToast("Montant invalide.");
       return;
     }
-    var entry = { id: uid(), date: date, type: currentType, category: category, description: description, amount: amount, createdAt: Date.now() };
-    if(currentType === "Investissement" && category === "Crypto"){
-      var q = parseFloat(document.getElementById("f_btcqty").value);
-      if(!isNaN(q) && q > 0) entry.btcQty = q;
+
+    var entry;
+    if(currentType === "Virement"){
+      var fromAcc = document.getElementById("f_from_account").value;
+      var toAcc = document.getElementById("f_to_account").value;
+      if(fromAcc === toAcc){
+        showToast("Choisissez deux comptes différents.");
+        return;
+      }
+      entry = { type: "Virement", date: date, fromAccount: fromAcc, toAccount: toAcc, amount: amount, description: document.getElementById("f_desc").value.trim(), category: "Virement" };
+    } else {
+      var category = document.getElementById("f_category").value;
+      if(!category || category === "__add__"){
+        showToast("Choisissez une catégorie.");
+        return;
+      }
+      entry = { type: currentType, date: date, category: category, description: document.getElementById("f_desc").value.trim(), amount: amount };
+      if(currentType === "Investissement" && category === "Crypto"){
+        var q = parseFloat(document.getElementById("f_btcqty").value);
+        if(!isNaN(q) && q > 0) entry.btcQty = q;
+      }
     }
-    state.transactions.push(entry);
+
+    if(editingId){
+      var idx = state.transactions.findIndex(function(x){ return x.id === editingId; });
+      if(idx > -1){
+        applyTxToAccounts(state.transactions[idx], -1);
+        entry.id = editingId;
+        entry.createdAt = state.transactions[idx].createdAt;
+        state.transactions[idx] = entry;
+        applyTxToAccounts(entry, 1);
+      }
+      showToast("Entrée modifiée");
+    } else {
+      entry.id = uid();
+      entry.createdAt = Date.now();
+      state.transactions.push(entry);
+      applyTxToAccounts(entry, 1);
+      showToast("Entrée enregistrée");
+    }
+
     saveTx();
+    saveAccounts();
     renderList();
     renderBilan();
+    renderAccounts();
     closeSheets();
-    showToast("Entrée enregistrée");
+  });
+
+  document.getElementById("deleteTxBtn").addEventListener("click", function(){
+    if(!editingId) return;
+    if(!confirm("Supprimer cette transaction ?")) return;
+    var idx = state.transactions.findIndex(function(x){ return x.id === editingId; });
+    if(idx > -1){
+      applyTxToAccounts(state.transactions[idx], -1);
+      state.transactions.splice(idx, 1);
+      saveTx();
+      saveAccounts();
+      renderList();
+      renderBilan();
+      renderAccounts();
+    }
+    closeSheets();
+    showToast("Entrée supprimée");
   });
 
   document.getElementById("txList").addEventListener("click", function(e){
-    var delBtn = e.target.closest("[data-del]");
-    if(!delBtn) return;
-    var id = delBtn.getAttribute("data-del");
-    if(confirm("Supprimer cette transaction ?")){
-      state.transactions = state.transactions.filter(function(t){ return t.id !== id; });
-      saveTx();
-      renderList();
-      renderBilan();
-      showToast("Entrée supprimée");
+    var item = e.target.closest(".tx-item");
+    if(!item) return;
+    openEditForm(item.getAttribute("data-id"));
+  });
+
+  // ---------- ADD CUSTOM CATEGORY ----------
+  document.getElementById("confirmAddCat").addEventListener("click", function(){
+    var name = document.getElementById("newCatName").value.trim();
+    var emoji = document.getElementById("newCatEmoji").value.trim() || "🔘";
+    if(!name){
+      showToast("Donnez un nom à la catégorie.");
+      return;
     }
+    var type = currentType;
+    if(type !== "Dépense" && type !== "Rentrée"){
+      addCatSheet.classList.remove("show");
+      return;
+    }
+    state.customCategories[type].push([name, emoji]);
+    saveCustomCategories();
+    populateCategories();
+    document.getElementById("f_category").value = name;
+    updateFormFieldsForType();
+    addCatSheet.classList.remove("show");
+    showToast("Catégorie ajoutée");
+  });
+  document.getElementById("cancelAddCat").addEventListener("click", function(){
+    addCatSheet.classList.remove("show");
   });
 
   // ---------- SETTINGS SHEET ----------
   document.getElementById("openSettings").addEventListener("click", function(){
     document.getElementById("s_btcqty").value = state.btcQty || "";
+    document.getElementById("s_acc_courant").value = state.accounts["Compte courant"] || 0;
+    document.getElementById("s_acc_jeune").value = state.accounts["Livret Jeune"] || 0;
+    document.getElementById("s_acc_a").value = state.accounts["Livret A"] || 0;
     openSheet(settingsSheet);
   });
   document.getElementById("cancelSettings").addEventListener("click", closeSheets);
@@ -655,13 +1017,23 @@
     var v = parseFloat(document.getElementById("s_btcqty").value);
     state.btcQty = isNaN(v) ? 0 : v;
     saveBtcQty();
+
+    var c1 = parseFloat(document.getElementById("s_acc_courant").value);
+    var c2 = parseFloat(document.getElementById("s_acc_jeune").value);
+    var c3 = parseFloat(document.getElementById("s_acc_a").value);
+    state.accounts["Compte courant"] = isNaN(c1) ? 0 : c1;
+    state.accounts["Livret Jeune"] = isNaN(c2) ? 0 : c2;
+    state.accounts["Livret A"] = isNaN(c3) ? 0 : c3;
+    saveAccounts();
+
     renderHeader(null);
     renderBilan();
+    renderAccounts();
     closeSheets();
     showToast("Paramètres enregistrés");
   });
 
-  // ---------- MONTH BUBBLE & MONTH VIEW ----------
+  // ---------- MONTH BUBBLE & PERIOD VIEW (mois / année) ----------
   function renderMonthBubble(){
     var now = new Date();
     var stats = computeMonthStats(now.getFullYear(), now.getMonth());
@@ -672,22 +1044,37 @@
     el.classList.toggle("neg", stats.bilan < 0);
   }
 
-  var monthState = { date: new Date() };
+  var periodState = { mode: "month", date: new Date() };
 
-  function renderMonthView(){
-    var y = monthState.date.getFullYear();
-    var m = monthState.date.getMonth();
-    var stats = computeMonthStats(y, m);
-    document.getElementById("monthViewTitle").textContent = MONTH_NAMES[m] + " " + y;
-    var html = '<div class="month-hint">‹ Glissez pour changer de mois ›</div>';
-    html += '<div class="month-bilan-card"><span class="lab">Bilan du mois</span><span class="val num ' +
-      (stats.bilan >= 0 ? "pos" : "neg") + '" style="color:' + (stats.bilan >= 0 ? "var(--green)" : "var(--red)") + '">' +
+  function renderPeriodView(){
+    var y = periodState.date.getFullYear();
+    var stats, title, hint;
+    if(periodState.mode === "month"){
+      var m = periodState.date.getMonth();
+      stats = computeMonthStats(y, m);
+      title = MONTH_NAMES[m] + " " + y;
+      hint = "‹ Glissez pour changer de mois ›";
+    } else {
+      stats = computeYearStats(y);
+      title = "Année " + y;
+      hint = "‹ Glissez pour changer d'année ›";
+    }
+    document.getElementById("monthViewTitle").textContent = title;
+
+    var html = '<div class="month-hint">' + hint + '</div>';
+    html += '<div class="month-bilan-card"><span class="lab">Bilan</span><span class="val num" style="color:' +
+      (stats.bilan >= 0 ? "var(--green)" : "var(--red)") + '">' +
       (stats.bilan >= 0 ? "+" : "") + fmtEur(stats.bilan) + '</span></div>';
     html += '<div class="month-stats-row"><div class="stat-card"><div class="lab">Rentrées</div><div class="val green num">' +
       fmtEur(stats.totalIn) + '</div></div><div class="stat-card"><div class="lab">Dépenses</div><div class="val red num">' +
       fmtEur(stats.totalOut) + '</div></div></div>';
+
+    html += renderPieBlock("Répartition des rentrées", categoryBreakdown(stats.txs, "Rentrée"));
+    html += renderPieBlock("Répartition des dépenses", categoryBreakdown(stats.txs, "Dépense"));
+
+    html += '<div class="section-title" style="margin-top:6px;">Transactions</div>';
     if(stats.txs.length === 0){
-      html += '<div class="empty-state">Aucune transaction ce mois-ci.</div>';
+      html += '<div class="empty-state">Aucune transaction sur cette période.</div>';
     } else {
       var sorted = stats.txs.slice().sort(function(a,b){
         return b.date.localeCompare(a.date) || (b.createdAt||0) - (a.createdAt||0);
@@ -697,14 +1084,25 @@
     document.getElementById("monthViewContent").innerHTML = html;
   }
 
-  function shiftMonth(delta){
-    monthState.date = new Date(monthState.date.getFullYear(), monthState.date.getMonth() + delta, 1);
-    renderMonthView();
+  function shiftPeriod(delta){
+    if(periodState.mode === "month"){
+      periodState.date = new Date(periodState.date.getFullYear(), periodState.date.getMonth() + delta, 1);
+    } else {
+      periodState.date = new Date(periodState.date.getFullYear() + delta, 0, 1);
+    }
+    renderPeriodView();
   }
 
   function openMonthView(){
-    monthState.date = new Date();
-    renderMonthView();
+    periodState.mode = "month";
+    periodState.date = new Date();
+    renderPeriodView();
+    document.getElementById("monthView").classList.add("show");
+  }
+  function openYearView(){
+    periodState.mode = "year";
+    periodState.date = new Date();
+    renderPeriodView();
     document.getElementById("monthView").classList.add("show");
   }
   function closeMonthView(){
@@ -712,23 +1110,17 @@
   }
 
   document.getElementById("openMonth").addEventListener("click", openMonthView);
+  document.getElementById("openYear").addEventListener("click", openYearView);
   document.getElementById("closeMonth").addEventListener("click", closeMonthView);
 
   document.getElementById("monthViewContent").addEventListener("click", function(e){
-    var delBtn = e.target.closest("[data-del]");
-    if(!delBtn) return;
-    var id = delBtn.getAttribute("data-del");
-    if(confirm("Supprimer cette transaction ?")){
-      state.transactions = state.transactions.filter(function(t){ return t.id !== id; });
-      saveTx();
-      renderList();
-      renderBilan();
-      renderMonthView();
-      showToast("Entrée supprimée");
-    }
+    var item = e.target.closest(".tx-item");
+    if(!item) return;
+    closeMonthView();
+    openEditForm(item.getAttribute("data-id"));
   });
 
-  // swipe between months
+  // swipe between months / years
   (function(){
     var area = document.getElementById("monthSwipeArea");
     var content = document.getElementById("monthViewContent");
@@ -761,7 +1153,7 @@
       if(dx < -threshold){
         content.style.transform = "translateX(-100%)";
         setTimeout(function(){
-          shiftMonth(1);
+          shiftPeriod(1);
           content.style.transition = "none";
           content.style.transform = "translateX(100%)";
           requestAnimationFrame(function(){
@@ -772,7 +1164,7 @@
       } else if(dx > threshold){
         content.style.transform = "translateX(100%)";
         setTimeout(function(){
-          shiftMonth(-1);
+          shiftPeriod(-1);
           content.style.transition = "none";
           content.style.transform = "translateX(-100%)";
           requestAnimationFrame(function(){
@@ -785,6 +1177,82 @@
       }
     });
   })();
+
+  // ---------- BITCOIN PRICE CHART ----------
+  var btcChartCache = {};
+  var btcChartRange = 1;
+
+  function renderBtcLineChart(points){
+    var wrap = document.getElementById("btcChartWrap");
+    if(!points || points.length < 2){
+      wrap.innerHTML = '<span class="chart-msg">Pas assez de données.</span>';
+      return;
+    }
+    var w = 290, h = 130, pad = 6;
+    var prices = points.map(function(p){ return p[1]; });
+    var min = Math.min.apply(null, prices), max = Math.max.apply(null, prices);
+    if(min === max){ min -= 1; max += 1; }
+    var n = points.length;
+    var coords = points.map(function(p, i){
+      var x = pad + (i/(n-1)) * (w - pad*2);
+      var y = pad + (1 - (p[1]-min)/(max-min)) * (h - pad*2);
+      return [x,y];
+    });
+    var linePath = "M" + coords.map(function(c){ return c[0].toFixed(1)+","+c[1].toFixed(1); }).join(" L");
+    var areaPath = linePath + " L" + coords[n-1][0].toFixed(1) + "," + (h-pad) + " L" + coords[0][0].toFixed(1) + "," + (h-pad) + " Z";
+    var rising = points[n-1][1] >= points[0][1];
+    var lineColor = rising ? "#34D399" : "#FB6B6B";
+    var svg = '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" preserveAspectRatio="none">' +
+      '<defs><linearGradient id="btcGrad" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="'+lineColor+'" stop-opacity="0.35"/>' +
+      '<stop offset="100%" stop-color="'+lineColor+'" stop-opacity="0"/></linearGradient></defs>' +
+      '<path d="'+areaPath+'" fill="url(#btcGrad)"/>' +
+      '<path d="'+linePath+'" fill="none" stroke="'+lineColor+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+      '</svg>';
+    wrap.innerHTML = svg;
+  }
+
+  function fetchBtcChart(days){
+    var wrap = document.getElementById("btcChartWrap");
+    if(btcChartCache[days]){
+      renderBtcLineChart(btcChartCache[days]);
+      return;
+    }
+    wrap.innerHTML = '<span class="chart-msg">Chargement…</span>';
+    fetch("https://api.coingecko.com/api/v3/coin/bitcoin/market_chart?vs_currency=eur&days=" + days)
+      .then(function(r){ if(!r.ok) throw new Error("net"); return r.json(); })
+      .then(function(data){
+        var points = (data && data.prices) ? data.prices : [];
+        btcChartCache[days] = points;
+        renderBtcLineChart(points);
+      })
+      .catch(function(){
+        wrap.innerHTML = '<span class="chart-msg">Graphique indisponible hors ligne.</span>';
+      });
+  }
+
+  document.getElementById("accBitcoin").addEventListener("click", function(){
+    document.getElementById("btcSheetPrice").textContent = state.btcPrice !== null ? fmtEur(state.btcPrice) : "-- €";
+    document.querySelectorAll("#btcRange button").forEach(function(b){ b.classList.remove("active"); });
+    document.querySelector('#btcRange button[data-range="1"]').classList.add("active");
+    btcChartRange = 1;
+    openSheet(btcSheet);
+    fetchBtcChart(1);
+  });
+
+  document.querySelectorAll("#btcRange button").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll("#btcRange button").forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      btcChartRange = parseInt(btn.getAttribute("data-range"), 10);
+      fetchBtcChart(btcChartRange);
+    });
+  });
+
+  document.getElementById("closeBtcSheet").addEventListener("click", function(){
+    btcSheet.classList.remove("show");
+    overlay.classList.remove("show");
+  });
 
   // ---------- HEADER HEIGHT SYNC (fixes overlap with main content) ----------
   function syncHeaderHeight(){
@@ -804,7 +1272,9 @@
     var payload = {
       exportedAt: new Date().toISOString(),
       btcQty: state.btcQty,
-      transactions: state.transactions
+      transactions: state.transactions,
+      accounts: state.accounts,
+      customCategories: state.customCategories
     };
     var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     var url = URL.createObjectURL(blob);
@@ -842,8 +1312,17 @@
         }
         state.transactions = data.transactions;
         state.btcQty = typeof data.btcQty === "number" ? data.btcQty : 0;
+        if(data.accounts && typeof data.accounts === "object"){
+          ACCOUNTS.forEach(function(a){ state.accounts[a] = typeof data.accounts[a] === "number" ? data.accounts[a] : 0; });
+        }
+        if(data.customCategories && typeof data.customCategories === "object"){
+          state.customCategories["Dépense"] = Array.isArray(data.customCategories["Dépense"]) ? data.customCategories["Dépense"] : [];
+          state.customCategories["Rentrée"] = Array.isArray(data.customCategories["Rentrée"]) ? data.customCategories["Rentrée"] : [];
+        }
         saveTx();
         saveBtcQty();
+        saveAccounts();
+        saveCustomCategories();
         renderAll();
         closeSheets();
         showToast("Données restaurées");
