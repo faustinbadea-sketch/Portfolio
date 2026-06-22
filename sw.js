@@ -1,4 +1,4 @@
-const CACHE_NAME = "mon-portfolio-v3";
+const CACHE_NAME = "mon-portfolio-v4";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", function (e) {
@@ -44,3 +44,5 @@ self.addEventListener("fetch", function (e) {
     })
   );
 });
+
+// v4
